@@ -1,2 +1,2 @@
 # SMAI
-(Sistema de Monitoramento Ambiental Inteligente
+Sistema de Monitoramento Ambiental Inteligente
