@@ -1,0 +1,5 @@
+../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	2
+../F1_Header/Include/core_cm3.h:1639:22:__NVIC_SetPriority	2
+../Src/rtc.c:17:36:rtc_get_time	2
+../Src/rtc.c:28:6:rtc_init_config	1
+../Src/rtc.c:55:6:rtc_set_config	5

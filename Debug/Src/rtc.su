@@ -1,0 +1,5 @@
+../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../F1_Header/Include/core_cm3.h:1639:22:__NVIC_SetPriority	16	static
+../Src/rtc.c:17:36:rtc_get_time	24	static
+../Src/rtc.c:28:6:rtc_init_config	8	static,ignoring_inline_asm
+../Src/rtc.c:55:6:rtc_set_config	4	static

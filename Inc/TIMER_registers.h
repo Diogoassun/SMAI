@@ -1,0 +1,26 @@
+/*
+ * TIMER_registers.h
+ *
+ *  Created on: May 21, 2025
+ *      Author: leand
+ */
+
+#ifndef TIMER_REGISTERS_H_
+#define TIMER_REGISTERS_H_
+
+#define TIMER1		0x40012C00UL
+#define TIMER2		0x40000000UL
+#define TIMER3		0x40000400UL
+#define TIMER4		0x40000800UL
+#define TIMER5		0x40000C00UL
+#define TIMER6		0x40001000UL
+#define TIMER7		0x40001400UL
+#define TIMER8		0x40013400UL
+#define TIMER9		0x40014C00UL
+#define TIMER10		0x40015000UL
+#define TIMER11		0x40015400UL
+#define TIMER12		0x40001800UL
+#define TIMER13		0x40001C00UL
+#define TIMER14		0x40002000UL
+
+#endif /* TIMER_REGISTERS_H_ */
