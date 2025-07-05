@@ -568,7 +568,7 @@ typedef struct
   * @{
   */
 
-
+#ifdef USE_STM32F103XB_HEADER
 #define FLASH_BASE            0x08000000UL /*!< FLASH base address in the alias region */
 #define FLASH_BANK1_END       0x0801FFFFUL /*!< FLASH END address of bank1 */
 #define SRAM_BASE             0x20000000UL /*!< SRAM base address in the alias region */
@@ -9870,6 +9870,7 @@ typedef struct
 #define FLASH_WRP3_nWRP3_Msk                (0xFFUL << FLASH_WRP3_nWRP3_Pos)    /*!< 0xFF000000 */
 #define FLASH_WRP3_nWRP3                    FLASH_WRP3_nWRP3_Msk               /*!< Flash memory write protection complemented option bytes */
 
+#endif
 
 
 /**

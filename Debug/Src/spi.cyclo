@@ -1,0 +1,7 @@
+../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	2
+../F1_Header/Include/core_cm3.h:1639:22:__NVIC_SetPriority	2
+../Src/spi.c:16:6:spi_interrupt_config	1
+../Src/spi.c:25:6:spi_dma_config	1
+../Src/spi.c:30:6:spi_init_config	1
+../Src/spi.c:60:15:spi_transmit_data	5
+../Src/spi.c:86:15:spi_receive_data	6

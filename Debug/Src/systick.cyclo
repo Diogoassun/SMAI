@@ -1,0 +1,4 @@
+../Src/systick.c:14:6:SysTick_Handler	1
+../Src/systick.c:19:28:systick_init_config	1
+../Src/systick.c:25:9:systick_get_flag	1
+../Src/systick.c:30:6:systick_clear_flag	1

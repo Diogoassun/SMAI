@@ -52,8 +52,10 @@ MEMORY
 SECTIONS
 {
   /* The startup code into "FLASH" Rom type memory */
+  _flash = ORIGIN(FLASH);
   .isr_vector :
   {
+  	_sflash = .;
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
@@ -85,16 +87,14 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /*.ARM.extab (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
-  .ARM.extab :
+  .ARM.extab (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {
     . = ALIGN(4);
     *(.ARM.extab* .gnu.linkonce.armextab.*)
     . = ALIGN(4);
   } >FLASH
 
-  /*.ARM (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
-  .ARM :
+  .ARM (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {
     . = ALIGN(4);
     __exidx_start = .;
@@ -103,8 +103,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /*.preinit_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
-  .preinit_array :
+  .preinit_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__preinit_array_start = .);
@@ -113,8 +112,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /*.init_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
-  .init_array :
+  .init_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__init_array_start = .);
@@ -124,8 +122,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /*.fini_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
-  .fini_array :
+  .fini_array (READONLY) : /* The "READONLY" keyword is only supported in GCC11 and later, remove it if using GCC10 or earlier. */
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__fini_array_start = .);
@@ -134,6 +131,9 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
     . = ALIGN(4);
   } >FLASH
+  
+  /*_sflash = LOADADDR(.isr_vector);*/
+  _eflash = .;
 
   /* Used by the startup to initialize data */
   _sidata = LOADADDR(.data);
