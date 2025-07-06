@@ -15,8 +15,6 @@
  *
  ******************************************************************************
  */
-jjjjjjjjjjjjjjjjjjjjjjjj
-aasdasffe ivmeovmaoscp,afomgringws9aoicpmd bjkrbvsiuadojcpkla. b
 
 #include <stdint.h>
 #include "HW_types.h"
