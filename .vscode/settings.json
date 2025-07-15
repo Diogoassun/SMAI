@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "hw_types.h": "c",
-        "timer_registers.h": "c",
-        "stdbool.h": "c"
-    }
-}
