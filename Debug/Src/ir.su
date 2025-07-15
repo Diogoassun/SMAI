@@ -1,0 +1,2 @@
+../Src/ir.c:14:7:ir_send_generic	32	static
+../Src/ir.c:45:6:ir_send_hitachi_ac	48	static
