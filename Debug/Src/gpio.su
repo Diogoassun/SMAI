@@ -1,0 +1,2 @@
+../Src/gpio.c:42:28:gpio_init_config	4	static
+../Src/gpio.c:80:28:lock_key_write_sequence	24	static

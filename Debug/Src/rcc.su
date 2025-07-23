@@ -1,0 +1,2 @@
+../Src/rcc.c:24:28:system_clock_config	4	static
+../Src/rcc.c:52:28:secondary_clock_config	4	static
