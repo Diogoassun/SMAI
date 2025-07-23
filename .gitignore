@@ -1,0 +1,15 @@
+# Ignorar arquivos relacionados ao módulo NRF
+Src/nrf24l01.c
+Inc/nrf24l01.h
+
+# Ignorar arquivos relacionados ao SPI
+Src/spi.c
+Inc/spi.h
+
+# (Opcional) Ignorar pasta Debug, se você não quiser subir arquivos de build
+Debug/
+
+# Ignorar arquivos de configuração do Eclipse (opcional)
+.cproject
+.project
+.settings/
