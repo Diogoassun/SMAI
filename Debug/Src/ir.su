@@ -1,2 +1,4 @@
 ../Src/ir.c:14:7:ir_send_generic	32	static
 ../Src/ir.c:45:6:ir_send_hitachi_ac	48	static
+../Src/ir.c:55:6:ir_send_data	72	static
+../Src/ir.c:94:6:ir_send_coolix	80	static

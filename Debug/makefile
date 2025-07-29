@@ -59,8 +59,8 @@ all: main-build
 main-build: pratica0.elf secondary-outputs
 
 # Tool invocations
-pratica0.elf pratica0.map: $(OBJS) $(USER_OBJS) C:\Users\ryanr\OneDrive\Documentos\EngSoft\SMAI\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "pratica0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\ryanr\OneDrive\Documentos\EngSoft\SMAI\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="pratica0.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+pratica0.elf pratica0.map: $(OBJS) $(USER_OBJS) C:\Users\ryanr\OneDrive\Documentos\EngSoft\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "pratica0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\ryanr\OneDrive\Documentos\EngSoft\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="pratica0.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

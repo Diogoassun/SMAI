@@ -1,0 +1,11 @@
+../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../Src/usart.c:93:6:usart1_clock_config	4	static
+../Src/usart.c:97:6:usart1_gpio_config	4	static
+../Src/usart.c:106:6:usart1_init_config	8	static
+../Src/usart.c:114:6:uart_write	16	static
+../Src/usart.c:122:6:USART1_IRQHandler	16	static
+../Src/usart.c:135:6:uart_write_int_ln	32	static
+../Src/usart.c:141:6:increase_temperature	16	static
+../Src/usart.c:152:6:decrease_temperature	16	static
+../Src/usart.c:165:6:process_command	24	static
+../Src/usart.c:177:6:send_ir_command	16	static

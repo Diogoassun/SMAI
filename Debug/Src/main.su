@@ -1,4 +1,1 @@
-../Src/main.c:114:5:main	56	static
-../Src/main.c:276:35:sleep_mode	4	static,ignoring_inline_asm
-../Src/main.c:281:35:stop_mode	4	static,ignoring_inline_asm
-../Src/main.c:291:35:standby_mode	4	static,ignoring_inline_asm
+../Src/main.c:119:5:main	32	static

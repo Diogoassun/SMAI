@@ -31,6 +31,7 @@
 #include "cmsis_gcc.h"
 #include "PWM_utils.h"
 #include "IR_utils.h"
+#include "USART_utils.h"
 
 #include "SPI_utils.h"
 #include "AFIO_utils.h"
@@ -111,6 +112,10 @@ unsigned char rx_address[5] = {0xEE, 0xDD, 0xCC, 0xBB, 0xAA};
 unsigned char tx_data[] = "HELLO WORLD\n";
 unsigned char rx_data[32] = {};
 
+
+
+
+
 int main(void)
 {
 	__UNUSED(data) = ((int)&_edata) - (int)&_sdata;
@@ -124,17 +129,24 @@ int main(void)
 	delay_ir_init();
 	ir_init_pwm();
 
-	//Teste IR
-const uint8_t tcl_power_on[] = {
-  0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
-  0x07, 0x40, 0x00, 0x00, 0x00, 0x80, 0x03
-};
+	usart1_clock_config();
+	usart1_gpio_config();
+	usart1_init_config();
 
-	while (true)
-	{
-		ir_send_hitachi_ac(tcl_power_on, sizeof(tcl_power_on), 1);
-		for (volatile int i = 0; i < 1000000; i++);
-	}
+	uart_write("Sistema IR pronto. Digite um comando:\r\n");
+
+	    while (1) {
+	        if (command_ready) {
+	            command_ready = 0;
+	            process_command(rx_buffer);
+	        }
+	    }
+
+
+
+
+
+}
 	
 	
 
@@ -185,7 +197,7 @@ const uint8_t tcl_power_on[] = {
 
 		//CLEAR_BIT(PWR+PWR_CSR, PWR_CSR_EWUP);
 		//HW_REG(PWR+PWR_CSR) &= ~PWR_CSR_EWUP;
-	}
+	//}
 
 	/*
 	if((HW_REG(RCCA+RCC_CSR) & (1<<29)) != (1<<29)){
@@ -273,33 +285,33 @@ const uint8_t tcl_power_on[] = {
 	
 //}
 
-static __attribute__((used)) void sleep_mode(){
-	HW_REG(SCB+SCB_SCR) &= ~SCB_SCR_SLEEPDEEP; //Clear DEEPSLEEP
-	__WFI();
-}
-
-static __attribute__((used)) void stop_mode(){
-	HW_REG(SCB+SCB_SCR) |= SCB_SCR_SLEEPDEEP; //Set DEEPSLEEP
-	HW_REG(PWR+PWR_CR) &= ~PWR_CR_PDDS;	//Clear PDDS
-	HW_REG(PWR+PWR_CR) &= ~PWR_CR_LPDS;	// Voltage regulator on during Stop mode
-	//HW_REG(PWR+PWR_CR) |= PWR_CR_LPDS;	//Voltage regulator in low-power mode
-	HW_REG(EXTI+EXTI_PR) |= 0x000FFFFF;
-	HW_REG(RTC+RTC_CRL) &= ~RTC_CRL_ALRF;
-	__WFI();
-}
-
-static __attribute__((used)) void standby_mode(){
-	//HW_REG(RCCA+RCC_APB1ENR) |= RCC_PWREN_CLOCK_ENABLE;
-	//HW_REG(RCCA+RCC_APB1ENR) |= RCC_BKPEN_CLOCK_ENABLE;
-	//HW_REG(PWR+PWR_CR) &= ~(1<<4);
-	//HW_REG(RCCA+RCC_CFGR) |= (0x3<<14);	//ADCPRE divided by 8
-	//HW_REG(RCCA+RCC_CFGR) |= (0x7<<11);	//PPRE2 divided by 16
-	//HW_REG(RCCA+RCC_CFGR) |= (0x7<<8);	//PPRE1 divided by 16
-	//HW_REG(RCCA+RCC_CFGR) |= (0xF<<4);	//SYSCLK divided by 512
-	//HW_REG(PWR+PWR_CSR) |= PWR_CSR_EWUP;
-	HW_REG(SCB+SCB_SCR) |= SCB_SCR_SLEEPDEEP; //Set DEEPSLEEP
-	HW_REG(PWR+PWR_CR) |= PWR_CR_PDDS;	//Set PDDS
-	HW_REG(PWR+PWR_CR) |= PWR_CR_CWUF;	//Clear Wakeup flag
-	while((HW_REG(PWR+PWR_CSR) & PWR_CSR_WUF) == PWR_CSR_WUF);
-	__WFI();
-}
+//static __attribute__((used)) void sleep_mode(){
+//	HW_REG(SCB+SCB_SCR) &= ~SCB_SCR_SLEEPDEEP; //Clear DEEPSLEEP
+//	__WFI();
+//}
+//
+//static __attribute__((used)) void stop_mode(){
+//	HW_REG(SCB+SCB_SCR) |= SCB_SCR_SLEEPDEEP; //Set DEEPSLEEP
+//	HW_REG(PWR+PWR_CR) &= ~PWR_CR_PDDS;	//Clear PDDS
+//	HW_REG(PWR+PWR_CR) &= ~PWR_CR_LPDS;	// Voltage regulator on during Stop mode
+//	//HW_REG(PWR+PWR_CR) |= PWR_CR_LPDS;	//Voltage regulator in low-power mode
+//	HW_REG(EXTI+EXTI_PR) |= 0x000FFFFF;
+//	HW_REG(RTC+RTC_CRL) &= ~RTC_CRL_ALRF;
+//	__WFI();
+//}
+//
+//static __attribute__((used)) void standby_mode(){
+//	//HW_REG(RCCA+RCC_APB1ENR) |= RCC_PWREN_CLOCK_ENABLE;
+//	//HW_REG(RCCA+RCC_APB1ENR) |= RCC_BKPEN_CLOCK_ENABLE;
+//	//HW_REG(PWR+PWR_CR) &= ~(1<<4);
+//	//HW_REG(RCCA+RCC_CFGR) |= (0x3<<14);	//ADCPRE divided by 8
+//	//HW_REG(RCCA+RCC_CFGR) |= (0x7<<11);	//PPRE2 divided by 16
+//	//HW_REG(RCCA+RCC_CFGR) |= (0x7<<8);	//PPRE1 divided by 16
+//	//HW_REG(RCCA+RCC_CFGR) |= (0xF<<4);	//SYSCLK divided by 512
+//	//HW_REG(PWR+PWR_CSR) |= PWR_CSR_EWUP;
+//	HW_REG(SCB+SCB_SCR) |= SCB_SCR_SLEEPDEEP; //Set DEEPSLEEP
+//	HW_REG(PWR+PWR_CR) |= PWR_CR_PDDS;	//Set PDDS
+//	HW_REG(PWR+PWR_CR) |= PWR_CR_CWUF;	//Clear Wakeup flag
+//	while((HW_REG(PWR+PWR_CSR) & PWR_CSR_WUF) == PWR_CSR_WUF);
+//	__WFI();
+//}
