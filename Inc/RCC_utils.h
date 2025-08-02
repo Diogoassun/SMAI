@@ -71,6 +71,9 @@
 #define RCC_APB2ENR_SPI1EN_CLOCK_ENABLE		(0x1<<12)
 #define RCC_APB2ENR_AFIOEN_CLOCK_ENABLE		(0x1<<0)
 
+#define RCC_APB1ENR_TIM2EN_CLOCK_ENABLE		(0x1<<0)
+#define RCC_APB2ENR_TIM1EN_CLOCK_ENABLE		(0x1<<11)
+
 void __attribute__((weak)) system_clock_config();
 void __attribute__((weak)) secondary_clock_config();
 

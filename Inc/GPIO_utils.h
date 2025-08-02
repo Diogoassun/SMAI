@@ -39,7 +39,13 @@
 #define CLEAR_BIT_GPIO(gpiox, bit)	\
 		HW_REG((gpiox)+GPIOx_ODR) &= ~(bit)
 
+#define TOGGLE_BIT_GPIO(gpiox, bit)	\
+		HW_REG((gpiox)+GPIOx_ODR) ^= (bit)
+
+void gpio_interrupt_config();
 void __attribute__((weak)) gpio_init_config();
 char __attribute__((weak)) lock_key_write_sequence(const short int port_bits);
+void __attribute__((weak)) gpio_isr_callback();
+void __attribute__((weak)) gpio_isr_nrfirq_callback();
 
 #endif /* GPIO_UTILS_H_ */

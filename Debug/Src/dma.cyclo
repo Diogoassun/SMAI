@@ -1,4 +1,6 @@
 ../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	2
 ../F1_Header/Include/core_cm3.h:1639:22:__NVIC_SetPriority	2
-../Src/dma.c:32:6:dma_init_config	1
-../Src/dma.c:82:6:dma_set_channel_config	1
+../Src/dma.c:35:6:dma_init_config	1
+../Src/dma.c:86:6:dma_set_channel_config	1
+../Src/dma.c:97:6:spi_transmit_dma	2
+../Src/dma.c:121:6:spi_receive_dma	2

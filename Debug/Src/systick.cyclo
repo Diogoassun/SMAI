@@ -1,1 +1,11 @@
-../Src/systick.c:11:28:systick_init_config	1
+../Src/systick.c:17:6:systick_isr_callback	1
+../Src/systick.c:21:28:systick_init_config	1
+../Src/systick.c:57:15:systick_countflag	1
+../Src/systick.c:61:6:systick_inc_tick	1
+../Src/systick.c:65:19:systick_get_tick	1
+../Src/systick.c:69:6:systick_set_flag	1
+../Src/systick.c:74:15:systick_get_flag	1
+../Src/systick.c:79:6:systick_clear_flag	1
+../Src/systick.c:85:14:systick_get_timeout	1
+../Src/systick.c:89:6:systick_set_timeout	1
+../Src/systick.c:93:6:systick_clear_timeout	1

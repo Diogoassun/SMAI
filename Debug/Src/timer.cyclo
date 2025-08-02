@@ -1,0 +1,2 @@
+../Src/timer.c:12:6:delay_ir_init	1
+../Src/timer.c:19:6:delay_us_ir	2

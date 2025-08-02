@@ -34,7 +34,14 @@
 #include "DMA_utils.h"
 #include "NRF24/nrf24l01.h"
 
+#include "PWM_utils.h"
+#include "IR_utils.h"
+#include "USART_utils.h"
 #include "I2C_utils.h"
+
+#include "SYSTICK_utils.h"
+
+#include "DEBUG.h"
 
 #define NOT_USE_STM32F103XB_HEADER
 #define USE_LSI
@@ -47,20 +54,6 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-#define __SUPPRESS_UNUSED(name) \
-	    _Pragma("GCC diagnostic push") \
-	    _Pragma("GCC diagnostic ignored \"-Wunused-but-set-variable\"") \
-		name; \
-	    _Pragma("GCC diagnostic pop")
-
-#define __SUPPRESS_UNUSED_VARIABLE(name)		__SUPPRESS_UNUSED(name)
-
-#define __SUPPRESS_UNUSED_EXTERN(type, name)	__SUPPRESS_UNUSED(extern type name)
-
-#define __UNUSED_RAW(type, n)	__attribute__((unused)) type n
-#define __UNUSED(n) 			__UNUSED_RAW(int, n)
-#define UNUSED(n) 				(void)(n)
-
 #define __WEAK					__attribute__((weak))
 #define __USED					__attribute__((used))
 
@@ -69,17 +62,7 @@ static __attribute__((used)) void sleep_mode();
 static __attribute__((used)) void stop_mode();
 static __attribute__((used)) void standby_mode();
 
-__SUPPRESS_UNUSED_EXTERN(int, _etext);
-__SUPPRESS_UNUSED_EXTERN(int, _sdata);
-__SUPPRESS_UNUSED_EXTERN(int, _edata);
-__SUPPRESS_UNUSED_EXTERN(int, _sbss);
-__SUPPRESS_UNUSED_EXTERN(int, _ebss);
-__SUPPRESS_UNUSED_EXTERN(int, _end);
-__SUPPRESS_UNUSED_EXTERN(int, _estack);
-__SUPPRESS_UNUSED_EXTERN(int, _flash);
-__SUPPRESS_UNUSED_EXTERN(int, _sflash);
-__SUPPRESS_UNUSED_EXTERN(int, _eflash);
-
+/*
 #define TX_ADDRESS			0xAABBCCDDEE
 
 #define ADDRESS_GENERATOR(val) { \
@@ -90,42 +73,71 @@ __SUPPRESS_UNUSED_EXTERN(int, _eflash);
     (uint8_t)((val) >> 32)  \
 }
 
-/*
-unsigned long int addr64 = TX_ADDRESS;
-// Quebra em bytes: LSB → MSB
-unsigned char tx_address[5] = {
-    (unsigned char)(addr64 >> 0),   // 0xEE
-    (unsigned char)(addr64 >> 8),   // 0xDD
-    (unsigned char)(addr64 >> 16),  // 0xCC
-    (unsigned char)(addr64 >> 24),  // 0xBB
-    (unsigned char)(addr64 >> 32)   // 0xAA
-};
-
 unsigned char tx_address[5] = ADDRESS_GENERATOR(TX_ADDRESS);
 */
-unsigned char tx_address[5] = {0xEE, 0xDD, 0xCC, 0xBB, 0xAA};
-unsigned char rx_address[5] = {0xEE, 0xDD, 0xCC, 0xBB, 0xAA};
-unsigned char tx_data[] = "HELLO WORLD\n";
-unsigned char rx_data[32] = {};
+
+//unsigned char tx_address[5] = {0x02, 0xDD, 0xCC, 0xBB, 0xAA};
+unsigned char rx_address[5] = {0x02, 0xDD, 0xCC, 0xBB, 0xAA};
+//unsigned char rx_address[5] = {0x02, 0xDD, 0xCC, 0xBB, 0xAA};
+//unsigned char tx_data[] = "HELLO WORLD\n";
+
+volatile unsigned char pipe_number;
+volatile unsigned int receive_pd;
+volatile unsigned int state_listenig_timeout;
+
+typedef enum {
+    STATE_IDLE,           // Ocioso, esperando para iniciar o próximo ciclo
+    STATE_BROADCASTING,   // Enviando a requisição para todos os nós
+    STATE_LISTENING,      // Ouvindo as respostas dos nós
+    STATE_PROCESSING      // Processando os dados recebidos e imprimindo
+} FSM_State;
+
+typedef enum {
+    NODE_UNKNOWN,
+    NODE_REQUEST_PENDING, // Aguardando resposta do nó
+    NODE_DATA_RECEIVED    // Dados recebidos com sucesso
+} NodeStatus;
+
+typedef struct {
+    unsigned char address[5];
+    NodeStatus status;
+    unsigned char received_data[32];
+} AuxiliaryNode;
+
+/*
+*/
+
+#define MAX_NODES		6
+
+unsigned char rx_addr[6][5] = {
+		{0x02, 0xDD, 0xCC, 0xBB, 0xAA},
+		{0x06, 0xDD, 0xCC, 0xBB, 0xAA},
+		{0x01, 0xDD, 0xCC, 0xBB, 0xAA},
+		{0x03, 0xDD, 0xCC, 0xBB, 0xAA},
+		{0x04, 0xDD, 0xCC, 0xBB, 0xAA},
+		{0x05, 0xDD, 0xCC, 0xBB, 0xAA}
+};
 
 int main(void)
 {
-	__UNUSED(data) = ((int)&_edata) - (int)&_sdata;
-	__UNUSED(bss) = ((int)&_ebss) - (int)&_sdata;
-	__UNUSED(size_app) = ((int)&_eflash) - (int)&_sflash;
-	__UNUSED(bank) = size_app/1024;
-	__UNUSED(setor) = size_app%1024;
+	//DEBUG_MODE_ON();
+	//DEBUG_MODE_OFF();
 
 	system_clock_config();
 	gpio_init_config();
+	delay_ir_init();
+	ir_init_pwm();
 	afio_init_config();
+	gpio_interrupt_config();
 	spi_init_config();
 	//spi_interrupt_config()
-	//spi_dma_config();
-	//dma_init_config();
-	//unsigned int ads = SPI1+SPI_DR;
+	spi_dma_config();
+	dma_init_config();
+
+
 	ENABLE_SPE_SPI();
 	//dma_set_channel_config(2, SPI1+SPI_DR, (unsigned int)tx_data, 12);
+	//dma_set_channel_config(2, SPI1+SPI_DR, (unsigned int)rx_data, 12);
 
 	secondary_clock_config();
 	//watchdog_init_config();
@@ -133,33 +145,10 @@ int main(void)
 	rtc_init_config();
 	rtc_set_config();
 
-	//char lock_key = lock_key_write_sequence(0x2FFF);
-	/*
-	if((HW_REG(RCCA+RCC_CSR) & (1<<29)) == (1<<29)){
-		HW_REG(RCCA+RCC_CSR) |= 1<<24;
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);
-	}
-	*/
-	__SUPPRESS_UNUSED(volatile int standbymode = 0;);
 	if((HW_REG(PWR+PWR_CSR) & PWR_CSR_SBF) == PWR_CSR_SBF){
-		standbymode = 1;
 		HW_REG(PWR+PWR_CR) |= PWR_CR_CSBF;
 
-
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);/*Delay*/
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<13);	//Reset C13
-		//for(int i=0;i<100000;i++);/*Delay*/
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);/*Delay*/
-
 		stop_mode();
-		//for(int i=0;i<100000;i++);
-		//HW_REG(GPIO_C+GPIOx_BSRR) &= ~(1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);
 
 		//CLEAR_BIT(PWR+PWR_CSR, PWR_CSR_EWUP);
 		//HW_REG(PWR+PWR_CSR) &= ~PWR_CSR_EWUP;
@@ -170,17 +159,6 @@ int main(void)
 		for(int i=0;i<100000;i++);
 	}
 
-	volatile int standbymode = 0;
-	if((HW_REG(PWR+PWR_CSR) & PWR_CSR_SBF) == PWR_CSR_SBF){
-		standbymode = 1;
-		HW_REG(PWR+PWR_CR) |= PWR_CR_CSBF;
-
-		HW_REG(GPIO_C+GPIOx_BSRR) = (lock_key<<29);	//Set C13
-
-		CLEAR_BIT(PWR+PWR_CSR, PWR_CSR_EWUP);
-		HW_REG(PWR+PWR_CSR) &= ~PWR_CSR_EWUP;
-	}
-
 	volatile int rtc_or_wkup = 0;
 	if((HW_REG(PWR+PWR_CSR) & PWR_CSR_WUF) == PWR_CSR_WUF){
 		rtc_or_wkup = 1;
@@ -188,28 +166,20 @@ int main(void)
 	*/
 
 	//ENABLE_SPE_SPI();
-	nrf24_init_config();
-	nrf24_rx_mode(rx_address, 10);
 	/*
+	nrf24_init_config();
+	nrf24_multiceiver(rx_address, 10);
+	nrf24_tx_mode_with_enaa(tx_address, 10);
 	nrf24_tx_mode(tx_address, 10);
+	nrf24_rx_mode(rx_address, 10);
 
 	char rx = 0;
 	ENABLE_SPE_SPI();
 	SELECT_CS_PIN_SPI();
 	rx = spi_transmit_data(rx_data, 2);
 	UNSELECT_CS_PIN_SPI();
-
-	if(nrf24_transmit(tx_data) == 1)
-	{
-		HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Set C13
-	}
-
-	if(is_data_available(1) == 1)
-	{
-		nrf24_receive(rx_data);
-		HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Set C13
-	}
 	*/
+
 	/*
 	i2c_init_config();
 	i2c_start();
@@ -217,33 +187,124 @@ int main(void)
 	i2c_transmit_data(tx_data, 1);
 	i2c_stop();
 	*/
-    /* Loop forever */
-	uint32_t last_time = rtc_get_time();
+
+	usart1_clock_config();
+	usart1_gpio_config();
+	usart1_init_config();
+
+	AuxiliaryNode networkNodes[MAX_NODES];
+	volatile unsigned char rx_data[6][32] = {};
+	FSM_State current_state = STATE_IDLE;
+
+	/* Loop forever */
+	unsigned int last_time = rtc_get_time();
 	for(;;)
 	{
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<29);	//Set C13
-		//for(int i=0;i<100000;i++);/*Delay*/
 
-		//HW_REG(GPIO_C+GPIOx_BSRR) = (1<<13);	//Reset C13
-		//for(int i=0;i<100000;i++);/*Delay*/
 		//sleep_mode();
 		//stop_mode();
 		//standby_mode();
 
-		uint32_t now = rtc_get_time();
+		//if(systick_countflag()){
+			//SYSTICK_EXCEPTION_DISABLE();
+			//HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
+		//}
+
+		/*
+		if (command_ready) {
+			command_ready = 0;
+			process_command(rx_buffer);
+		}
+		*/
+
+
+		unsigned int now = rtc_get_time();
 		if ((now - last_time) >= 1) {
-			/*
-			if(nrf24_transmit(tx_data) == 1)
-			{
-				HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
-			}
-			*/
-			if(is_data_available(1)){
-				nrf24_receive(rx_data);
-				HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
+
+			switch(current_state){
+				case STATE_IDLE:
+					current_state = STATE_BROADCASTING;
+					break;
+
+				case STATE_BROADCASTING:
+					for(int i = 0; i < MAX_NODES ;i++) {
+						nrf24_init_config();
+						nrf24_tx_mode((unsigned char*)(rx_addr+i), 10);
+						// Habilitar auto-ack
+						//nrf24_tx_mode_with_enaa((unsigned char*)(rx_addr+i), 10);
+
+						//if(nrf24_transmit_no_ack((unsigned char*)(rx_addr+i)) == 1)
+						if(nrf24_transmit((unsigned char*)(rx_addr+i)) == 1)
+						{
+							HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
+							for(int i=0;i<100000;i++){};
+							networkNodes[i].status = NODE_REQUEST_PENDING;
+						}
+					}
+					nrf24_init_config();
+					nrf24_multiceiver(rx_address, 10);
+
+					state_listenig_timeout = 0;
+
+					systick_init_config(1000*1000*1);
+					/*
+					while(1){};
+					*/
+
+					current_state = STATE_LISTENING;
+					break;
+
+				case STATE_LISTENING:
+					for(int node_id = 0; node_id < MAX_NODES ; node_id++) {
+						pipe_number = read_pipe();
+						//pipe_number = read_security_pipe(rx_data);
+
+						//if(is_data_available(1) == 1){}
+						if((pipe_number != 6) && (pipe_number != 7))
+						{
+							//networkNodes[pipe_number].status = NODE_DATA_RECEIVED;
+							nrf24_receive((unsigned char*)(rx_data+pipe_number));
+							receive_pd = nrf24_read_reg(NRF24L01_RPD);
+							//HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
+						}
+					}
+
+					if(state_listenig_timeout == 1){
+						state_listenig_timeout = 0;
+						//SYSTICK_EXCEPTION_DISABLE();
+						current_state = STATE_PROCESSING;
+					}
+
+					break;
+
+				case STATE_PROCESSING:
+					/*
+					unsigned int umidade = ( ((unsigned int)buffer[1] << 16) | ((unsigned int)buffer[2] << 8) | (buffer[3]) ) >> 4 ;
+					unsigned int temperatura = ((unsigned int)(buffer[3]&0x0F) << 16) | ((unsigned int)buffer[4] << 8) | (unsigned int)buffer[5] ;
+
+					umid = ((float)umidade / 1048576.0f) * 100.0f;
+					temp = ((float)temperatura / 1048576.0f) * 200.0f - 50.0f;
+					*/
+					for(int node_id = 0; node_id < MAX_NODES ; node_id++) {
+						/*
+						if (networkNodes[node_id].status == NODE_DATA_RECEIVED)
+						{
+							rx_data[node_id][0];
+							uart_write_int_ln(umidade);
+							uart_write_int_ln(temperatura);
+							uart_write("Recebido\r\n");
+						}
+							*/
+					}
+
+					current_state = STATE_IDLE;
+					break;
+
+				default:
+
+					break;
 			}
 
-			//HW_REG(GPIO_C+GPIOx_ODR) ^= (1<<13);	//Toggle C13
 			last_time = now;
 		}
 	}

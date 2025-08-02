@@ -63,7 +63,8 @@ void rtc_set_config(){
 
 
 	//HW_REG(RTC+RTC_PRLH) = 0;	//Only write
-	HW_REG(RTC+RTC_PRLL) = ((FREQ_40KHz+1)/2)-1;	//Only write
+	//HW_REG(RTC+RTC_PRLL) = ((FREQ_40KHz+1)/2)-1;	//Only write
+	HW_REG(RTC+RTC_PRLL) = FREQ_40KHz;	//Only write
 
 	//HW_REG(RTC+RTC_DIVH);	//Only read
 	//HW_REG(RTC+RTC_DIVL);	//Only read

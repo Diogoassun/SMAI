@@ -1,6 +1,6 @@
-# Ignorar arquivos relacionados ao módulo NRF
+git rm -r --cached node_modules/# Ignorar arquivos relacionados ao módulo NRF
+Inc/NRF24/*
 Src/nrf24l01.c
-Inc/nrf24l01.h
 
 # Ignorar arquivos relacionados ao SPI
 Src/spi.c
@@ -13,3 +13,4 @@ Debug/
 .cproject
 .project
 .settings/
+.gitignore

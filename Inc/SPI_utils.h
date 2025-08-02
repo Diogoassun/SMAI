@@ -58,4 +58,8 @@ unsigned char spi_transmit_data(unsigned char* tx_data, int size);
 
 unsigned char spi_receive_data(unsigned char* rx_data, int size);
 
+unsigned char spi_dma_transmit_data(unsigned char* tx_data, unsigned char* dummy, int size);
+
+unsigned char spi_dma_receive_data(unsigned char* rx_data, unsigned char* dummy, int size);
+
 #endif /* SPI_UTILS_H_ */

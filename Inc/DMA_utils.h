@@ -41,7 +41,8 @@
 #define DMA_CHANNEL7			6
 
 void dma_init_config();
-void dma_set_channel_config(unsigned char dmaa_channel, unsigned int src_addr, unsigned int dst_addr, unsigned short int data_size);
-
+void dma_set_channel_config(unsigned char dmaa_channel, unsigned int peripheral_addr, unsigned int memory_addr, unsigned short int data_size);
+void spi_transmit_dma(unsigned int peripheral_addr, unsigned int tx_data_memory_addr, unsigned int rx_data_memory_addr, unsigned short int data_size);
+void spi_receive_dma(unsigned int peripheral_addr, unsigned int tx_data_memory_addr, unsigned int rx_data_memory_addr, unsigned short int data_size);
 
 #endif /* DMA_UTILS_H_ */

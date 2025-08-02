@@ -1,2 +1,5 @@
-../Src/gpio.c:42:28:gpio_init_config	4	static
-../Src/gpio.c:80:28:lock_key_write_sequence	24	static
+../F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../Src/gpio.c:61:6:gpio_interrupt_config	8	static
+../Src/gpio.c:69:28:gpio_init_config	4	static
+../Src/gpio.c:119:28:lock_key_write_sequence	24	static
+../Src/gpio.c:144:28:gpio_isr_nrfirq_callback	4	static
